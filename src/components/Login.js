@@ -1,11 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { signInWithGoogle } from '../features/user/userSlice';
 
 const Login = (props) => {
 
+    const navigate = useNavigate();
     const user = useSelector(state => state.users.user);
 
     if (user) {
@@ -84,7 +85,7 @@ const Login = (props) => {
                                     <a href='/'>
                                         Forgot Password?
                                     </a>
-                                    <button>
+                                    <button type='button' onClick={() => navigate('/dashboard')}>
                                         Sign in
                                     </button>
                                     <ButtonSpacer>
