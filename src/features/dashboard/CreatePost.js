@@ -5,6 +5,15 @@ import Card from '../../components/Card';
 import Avatar from "../../components/Avatar";
 
 const CreatePost = (props) => {
+
+    const onPostHandler = () => {
+        const body = document.getElementsByTagName('body');
+        body[0].classList.add('modal-open');
+
+        const modal = document.getElementById('modal');
+        modal.classList.add('open');
+    }
+
     return  (
         <Container>
             <Card>
@@ -13,7 +22,7 @@ const CreatePost = (props) => {
                     <button>Start a post</button>
                 </StartPost>
                 <PostType>
-                    <PostTypeItem>
+                    <PostTypeItem onClick={onPostHandler}>
                         <img src='/images/photo-icon.svg' alt=''/>
                         <span>Photo</span>
                     </PostTypeItem>

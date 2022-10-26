@@ -52,10 +52,9 @@ const ProfileCard = (props) => {
                         </HashTagItem>
                         <HashTagItem>
                             <img src='/images/hashtag-icon.svg' alt=''/>
-                            <span>Programming</span>
+                            <span>Full stacked developer</span>
                         </HashTagItem>
                     </HashTagList>
-              
                 </Card>
             </RecentContainer>
         </ProfileLayout>

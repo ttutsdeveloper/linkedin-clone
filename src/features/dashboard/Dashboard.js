@@ -1,9 +1,10 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import styled from 'styled-components';
 import Ads from "./Ads";
 import CreatePost from "./CreatePost";
 import Header from "./Header";
+import Modal from "../../components/Modal";
 import ProfileCard from "./ProfileCard";
 
 const Dashboard = () => {
@@ -27,7 +28,7 @@ const Dashboard = () => {
                                             <PostProfile>
                                                 <CircleImage src={user && user.picture} alt=''/>
                                                 <div>
-                                                    <a>
+                                                    <a href="/">
                                                         John Paul I. <span>3rd +</span>
                                                     </a>
                                                     <p> Position</p>
@@ -80,6 +81,13 @@ const Dashboard = () => {
                     <Ads/>
                 </LayoutContainer>
             </DashboardContainer>
+            <Modal title="Edit your photo">
+                <UploadPhoto>
+                    <input type={'file'} id="file-upload"/>
+                    <label for="file-upload">Select images to share</label>
+                </UploadPhoto>
+
+            </Modal>
         </Content>
     )
 
@@ -241,6 +249,31 @@ const PostActionItem = styled.li`
         font-size: 14px;
         font-weight: 600;
         margin-left: 5px;
+    }
+`;
+
+const UploadPhoto = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+    & input {
+        display: none;
+    }
+    
+    & label {
+        color: #0a66c2;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 5px 8px;
+        cursor: pointer;
+
+        :hover {
+            background-color: rgba(112, 181, 249, 0.2);
+            border-radius: 5px;
+        }
     }
 `;
 

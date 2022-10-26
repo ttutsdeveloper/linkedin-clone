@@ -16,7 +16,7 @@ const Ads = () => {
                                     [1, 2, 3, 4].map(data => {
                                         return <RecommendationItem key={data}>
                                             <img src='/images/google-img.jpg' alt=''/>
-                                            <a>
+                                            <a href="/">
                                                 Google
                                                 <span>Company Computer Software</span>
                                                 <button>+ Follow</button>
