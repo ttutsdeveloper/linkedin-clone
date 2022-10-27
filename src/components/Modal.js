@@ -25,6 +25,8 @@ const Modal = (props) => {
     const onCloseHandler  = () => {
         const modal = document.getElementById('modal');
         modal.classList.remove('open');
+        const body = document.getElementsByTagName('body');
+        body[0].classList.remove('modal-open');
     }
 
     return (
@@ -37,14 +39,14 @@ const Modal = (props) => {
                 <PostModalBody>
                     { props.children }
                 </PostModalBody>
-                <PostModalFooter>
+                {props.showFooter && <PostModalFooter>
                     <ButtonSecondary>
                         Cancel
                     </ButtonSecondary>
-                    <ButtonPrimary>
+                    <ButtonPrimary onClick={props.onClickDone}>
                         Done
                     </ButtonPrimary>
-                </PostModalFooter>
+                </PostModalFooter>}
             </PostModalContent>     
         </Container>
     )
@@ -59,7 +61,7 @@ const Container = styled.div`
     width: 100vw;
     background-color: rgba(0, 0, 0, .75);
     display: none;
-
+    
     &.open {
         display: block;
     }
@@ -72,6 +74,7 @@ const PostModalContent = styled.div`
     margin: 0 auto;
     border-radius: 10px;
     z-index: 2;
+    overflow-y: auto;
 `;
 
 const PostModalHeader = styled.div`
@@ -100,6 +103,10 @@ const PostModalHeader = styled.div`
 `;
 
 const PostModalBody = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
 `;
 
 const PostModalFooter = styled.div`
