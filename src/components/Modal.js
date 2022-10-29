@@ -37,16 +37,21 @@ const Modal = (props) => {
                     <img src='/images/close-button.svg' alt='' onClick={onCloseHandler}/>
                 </PostModalHeader>
                 <PostModalBody>
-                    { props.children }
+                    { props.child1 }
                 </PostModalBody>
-                {props.showFooter && <PostModalFooter>
-                    <ButtonSecondary>
-                        Cancel
-                    </ButtonSecondary>
-                    <ButtonPrimary onClick={props.onClickDone}>
-                        Done
-                    </ButtonPrimary>
-                </PostModalFooter>}
+                <PostModalFooter>
+                    {props.showFooter && 
+                        <ButtonContainer>
+                            <ButtonSecondary>
+                                Cancel
+                            </ButtonSecondary>
+                            <ButtonPrimary onClick={props.onClickDone}>
+                                {props.buttontTitle}
+                            </ButtonPrimary>
+                        </ButtonContainer>
+                    }
+                    { props.child2 }
+                </PostModalFooter>
             </PostModalContent>     
         </Container>
     )
@@ -70,11 +75,17 @@ const Container = styled.div`
 const PostModalContent = styled.div`
     width: 552px;
     background-color: white;
-    height: 100vh;
     margin: 0 auto;
     border-radius: 10px;
     z-index: 2;
     overflow-y: auto;
+    max-height: calc(100vh - 160px);
+    top: 32px;
+    position: relative;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const PostModalHeader = styled.div`
@@ -112,8 +123,14 @@ const PostModalBody = styled.div`
 const PostModalFooter = styled.div`
     padding: 10px 30px;
     display: flex;
+    /* justify-content: flex-end; */
+`;
+
+const ButtonContainer = styled.div`
+    display: flex;
     justify-content: flex-end;
     gap: 10px;
+    flex: 1;
 `;
 
 

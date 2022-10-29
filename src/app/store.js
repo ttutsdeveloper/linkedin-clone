@@ -1,9 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import userReducer from '../features/user/userSlice';
+import feedReducer from '../features/dashboard/feedSlice';
 
 const rootReducer = combineReducers({
     users: userReducer,
+    feeds: feedReducer
 });
 
 const store = configureStore({ 

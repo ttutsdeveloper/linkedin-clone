@@ -1,5 +1,5 @@
-import React, { Fragment, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from 'styled-components';
 import Ads from "./Ads";
 import CreatePost from "./CreatePost";
@@ -7,13 +7,30 @@ import Header from "./Header";
 import Modal from "../../components/Modal";
 import ProfileCard from "./ProfileCard";
 import Avatar from "../../components/Avatar";
+import { fetchFeeds } from "./feedSlice";
+
+const postSteps = {
+    picture: [
+        {
+            postTitle: 'Edit your photo',
+            buttontTitle: 'Done',
+        },
+        {
+            postTitle: 'Create a post',
+            buttontTitle: 'Post',
+        }
+    ]
+};
 
 const Dashboard = () => {
 
     const [image, setImage] = useState('');
     const [isDone, setIsDone] = useState(false);
+    const [currentStep, setCurrentStep] = useState('');
 
     const user = useSelector(state => state.users.user);
+    const feeds = useSelector(state => state.feeds.feeds);
+    const dispatch = useDispatch()
 
     const handleUploadImage = (e) => {
         const image = e.target.files[0];
@@ -25,6 +42,23 @@ const Dashboard = () => {
         setImage(image);
     }
 
+    useEffect(() => {
+        dispatch(fetchFeeds());
+    }, [dispatch]);
+    
+
+    const onClickImage = () => {
+        const body = document.getElementsByTagName('body');
+        body[0].classList.add('modal-open');
+
+        const modal = document.getElementById('modal');
+        modal.classList.add('open');
+
+        console.log(currentStep);
+
+        setCurrentStep(postSteps.picture[0]);
+    }
+
     return (
         <Content>
             <DashboardContainer>
@@ -32,38 +66,36 @@ const Dashboard = () => {
                 <LayoutContainer>
                     <ProfileCard />
                     <NewsFeed>
-                        <CreatePost user={user} />
+                        <CreatePost user={user} onClickImage={onClickImage} />
                         <PostList>
                             {
-                                [0, 1, 2, 3, 4].map((data) => {
-                                    return  <PostListItem key={data}>
+                                feeds.map((feed) => {
+                                    return  <PostListItem key={feed.id}>
                                         <Card>
                                         <PostHeader>
                                             <PostProfile>
-                                                <CircleImage src={user && user.picture} alt=''/>
+                                                <CircleImage src={feed.post.images[0]} alt=''/>
                                                 <div>
                                                     <a href="/">
-                                                        John Paul I. <span>3rd +</span>
+                                                        {feed.user.name} <span>3rd +</span>
                                                     </a>
-                                                    <p> Position</p>
+                                                    <p> {feed.user.postion}</p>
                                                     <p>1 week</p>
                                                 </div>
                                             </PostProfile>
                                             <PostContent>
-                                                <span>
-                                                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                                                </span>
+                                                <span>{feed.post.message}</span>
                                             </PostContent>
                                             <PostActivities>
                                                 <PostReaction>
                                                     <img src='/images/like-icon.svg' alt=''/>
                                                     <img src='/images/heart-icon.svg' alt=''/>
                                                     <img src='/images/clap-icon.svg' alt=''/>
-                                                    <span>John Paul and 1,841 others</span>
+                                                    <span>{feed.socialReactions.likes}</span>
                                                 </PostReaction>
                                                 <PostShare>
-                                                    <span>1, 136 comments</span>
-                                                    <span>17 reposts</span>
+                                                    <span>{feed.socialReactions.comments} comments</span>
+                                                    <span>{feed.socialReactions.repost} reposts</span>
                                                 </PostShare>
                                             </PostActivities>
                                             <PostActions>
@@ -95,11 +127,14 @@ const Dashboard = () => {
                     <Ads/>
                 </LayoutContainer>
             </DashboardContainer>
-            <Modal title="Edit your photo" 
-                onClickDone={() => {setIsDone(true)}} 
+            <Modal title={currentStep.postTitle}
+                onClickDone={() => {
+                    setCurrentStep(postSteps.picture[1]);
+                    setIsDone(true);
+                }} 
                 showFooter={!isDone}
-            >
-                { isDone ? 
+                buttontTitle={currentStep.buttontTitle}
+                child1={ isDone ? 
                     <PostContainer>
                         <PostPhotoProfile>
                             <Avatar user={user} height={48} width={48} />
@@ -114,33 +149,9 @@ const Dashboard = () => {
                         </PostPhotoProfile>
                         <textarea placeholder="What do you want to talk about?" rows={3}/>
                         <ImageContainer>
-                            <img src={URL.createObjectURL(image)}/> 
+                            <img src={URL.createObjectURL(image)} alt=''/> 
                         </ImageContainer>
-                        <PostFooter>
-                            <PostFooterList>
-                                <PostFooterItem>
-                                    <img src='/images/gallery-icon.svg' alt=''/>
-                                </PostFooterItem>
-                                <PostFooterItem>
-                                    <img src='/images/post-video-icon.svg' alt=''/>
-                                </PostFooterItem>
-                                <PostFooterItem>
-                                    <img src='/images/file-icon.svg' alt=''/>
-                                </PostFooterItem>
-                                <PostFooterItem>
-                                    <img src='/images/post-job-icon.svg' alt=''/>
-                                </PostFooterItem>
-                                <PostFooterItem>
-                                    <img src='/images/occasion-icon.svg' alt=''/>
-                                </PostFooterItem>
-                                <PostFooterItem>
-                                    <img src='/images/poll-icon.svg' alt=''/>
-                                </PostFooterItem>
-                            </PostFooterList>
-                            <ButtonPrimary>
-                                Post
-                            </ButtonPrimary>
-                        </PostFooter>
+                    
                     </PostContainer>
                     : <Fragment>
                         { !image ? <UploadPhoto>
@@ -153,11 +164,38 @@ const Dashboard = () => {
                             <label for="file-upload">Select images to share</label>
                             </UploadPhoto> : 
                             <PhotoContainer>
-                                <img src={URL.createObjectURL(image)}/> 
+                                <img src={URL.createObjectURL(image)} alt=''/> 
                             </PhotoContainer>
                         }
                     </Fragment>
                 }
+                child2={ isDone && <PostFooter>
+                        <PostFooterList>
+                            <PostFooterItem>
+                                <img src='/images/gallery-icon.svg' alt=''/>
+                            </PostFooterItem>
+                            <PostFooterItem>
+                                <img src='/images/post-video-icon.svg' alt=''/>
+                            </PostFooterItem>
+                            <PostFooterItem>
+                                <img src='/images/file-icon.svg' alt=''/>
+                            </PostFooterItem>
+                            <PostFooterItem>
+                                <img src='/images/post-job-icon.svg' alt=''/>
+                            </PostFooterItem>
+                            <PostFooterItem>
+                                <img src='/images/occasion-icon.svg' alt=''/>
+                            </PostFooterItem>
+                            <PostFooterItem>
+                                <img src='/images/poll-icon.svg' alt=''/>
+                            </PostFooterItem>
+                        </PostFooterList>
+                        <ButtonPrimary>
+                            {currentStep.buttontTitle}
+                        </ButtonPrimary>
+                    </PostFooter>
+                }
+            >
             </Modal>
         </Content>
     )
@@ -350,17 +388,20 @@ const UploadPhoto = styled.div`
 
 const PhotoContainer = styled.div`
     width: 100%;
-    max-height: calc(100vh - 126px);
     overflow: auto;
-    
+    max-height: calc(100vh - 334px);
+
     & img {
         width: 100%;
     }
 `;
 
 const PostContainer = styled.div`
-    padding: 10px;
+    padding: 25px;
     width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 334px);
 
     & textarea {
         padding: 15px 10px 10px 10px;
@@ -426,6 +467,7 @@ const PostFooter = styled.div`
     display: flex;
     margin-top: 10px;
     align-items: center;
+    flex: 1;
 `;
 
 const PostFooterList = styled.ul`
