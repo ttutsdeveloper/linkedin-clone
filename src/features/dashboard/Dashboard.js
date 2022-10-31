@@ -7,7 +7,7 @@ import Header from "./Header";
 import Modal from "../../components/Modal";
 import ProfileCard from "./ProfileCard";
 import Avatar from "../../components/Avatar";
-import { fetchFeeds } from "./feedSlice";
+import { fetchFeeds, postFeed } from "./feedSlice";
 
 const postSteps = {
     picture: [
@@ -58,6 +58,19 @@ const Dashboard = () => {
 
         setCurrentStep(postSteps.picture[0]);
     }
+    
+
+    const postFeedHandler = (e) => {
+        e.preventDefault();
+        const payload = {
+            name: 'John Paul Inhog',
+            positon: 'Senior Software Engineer',
+            postType: 'image',
+            image: image,
+            description: 'Lorem ipsum',
+        }
+        dispatch(postFeed(payload));
+    }
 
     return (
         <Content>
@@ -74,7 +87,7 @@ const Dashboard = () => {
                                         <Card>
                                         <PostHeader>
                                             <PostProfile>
-                                                <CircleImage src={feed.post.images[0]} alt=''/>
+                                                <CircleImage src={'/'} alt=''/>
                                                 <div>
                                                     <a href="/">
                                                         {feed.user.name} <span>3rd +</span>
@@ -84,7 +97,10 @@ const Dashboard = () => {
                                                 </div>
                                             </PostProfile>
                                             <PostContent>
-                                                <span>{feed.post.message}</span>
+                                                <span>{feed.post.description}</span>
+                                                <PostContentImage>
+                                                    <img src={feed.post.image} />
+                                                </PostContentImage>
                                             </PostContent>
                                             <PostActivities>
                                                 <PostReaction>
@@ -190,7 +206,7 @@ const Dashboard = () => {
                                 <img src='/images/poll-icon.svg' alt=''/>
                             </PostFooterItem>
                         </PostFooterList>
-                        <ButtonPrimary>
+                        <ButtonPrimary onClick={(events) => postFeedHandler(events)}>
                             {currentStep.buttontTitle}
                         </ButtonPrimary>
                     </PostFooter>
@@ -503,6 +519,14 @@ const ButtonPrimary = styled.button`
         background-color: #09223b;
         color: hsla(0, 0%, 100%, 0.9);
     }
+`;
+
+const PostContentImage = styled.div`
+    max-height: 350px;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 export default Dashboard;
