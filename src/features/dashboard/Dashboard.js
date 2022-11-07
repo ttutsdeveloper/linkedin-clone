@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Ads from "./Ads";
 import CreatePost from "./CreatePost";
 import Header from "./Header";
-import Modal from "../../components/Modal";
+import Modal, { modalAction } from "../../components/Modal";
 import ProfileCard from "./ProfileCard";
 import Avatar from "../../components/Avatar";
 import { fetchFeeds, postFeed } from "./feedSlice";
@@ -30,6 +30,7 @@ const Dashboard = () => {
 
     const user = useSelector(state => state.users.user);
     const feeds = useSelector(state => state.feeds.feeds);
+    const isLoading = useSelector(state => state.feeds.loading);
     const dispatch = useDispatch()
 
     const handleUploadImage = (e) => {
@@ -38,7 +39,6 @@ const Dashboard = () => {
         if (image === '' || image === undefined) {
             return;
         }
-
         setImage(image);
     }
 
@@ -48,17 +48,14 @@ const Dashboard = () => {
     
 
     const onClickImage = () => {
-        const body = document.getElementsByTagName('body');
-        body[0].classList.add('modal-open');
-
-        const modal = document.getElementById('modal');
-        modal.classList.add('open');
-
-        console.log(currentStep);
-
+        modalAction('open');
         setCurrentStep(postSteps.picture[0]);
     }
-    
+
+    const closeModalHanlder = (isClose) => {
+        setImage(null);
+        setIsDone(false);
+    }
 
     const postFeedHandler = (e) => {
         e.preventDefault();
@@ -68,8 +65,10 @@ const Dashboard = () => {
             postType: 'image',
             image: image,
             description: 'Lorem ipsum',
-        }
+        };
+
         dispatch(postFeed(payload));
+        modalAction('closeButton');
     }
 
     return (
@@ -80,6 +79,7 @@ const Dashboard = () => {
                     <ProfileCard />
                     <NewsFeed>
                         <CreatePost user={user} onClickImage={onClickImage} />
+                        {isLoading && <h1>Loading...</h1>}
                         <PostList>
                             {
                                 feeds.map((feed) => {
@@ -150,6 +150,7 @@ const Dashboard = () => {
                 }} 
                 showFooter={!isDone}
                 buttontTitle={currentStep.buttontTitle}
+                onCloseModal={closeModalHanlder}
                 child1={ isDone ? 
                     <PostContainer>
                         <PostPhotoProfile>
@@ -522,11 +523,15 @@ const ButtonPrimary = styled.button`
 `;
 
 const PostContentImage = styled.div`
-    max-height: 350px;
     overflow-y: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
 `;
 
 export default Dashboard;

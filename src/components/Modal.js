@@ -1,15 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from 'styled-components';
 
 const Modal = (props) => {
 
     const closeModalHandler = () => {
-        const modal = document.getElementById('modal');
-        if (!modal.classList.contains('active')) {
-            modal.classList.remove('open');
-            const body = document.getElementsByTagName('body');
-            body[0].classList.remove('modal-open');
-        }
+        modalAction('close');
     }
 
     const onMouseHoverHandler = () => {
@@ -23,10 +19,7 @@ const Modal = (props) => {
     }
 
     const onCloseHandler  = () => {
-        const modal = document.getElementById('modal');
-        modal.classList.remove('open');
-        const body = document.getElementsByTagName('body');
-        body[0].classList.remove('modal-open');
+        modalAction('closeButton');
     }
 
     return (
@@ -55,6 +48,35 @@ const Modal = (props) => {
             </PostModalContent>     
         </Container>
     )
+}
+
+
+export const modalAction = (modalState) => {
+    const modal = document.getElementById('modal');
+    const body = document.getElementsByTagName('body');
+
+    switch(modalState) {
+        case 'open': {
+            body[0].classList.add('modal-open');
+            const modal = document.getElementById('modal');
+            modal.classList.add('open');
+            break;
+        }
+        case 'close': {
+            if (!modal.classList.contains('active')) {
+                modal.classList.remove('open');
+                body[0].classList.remove('modal-open');
+            }
+            break;
+        }
+        case 'closeButton': {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('open');
+            const body = document.getElementsByTagName('body');
+            body[0].classList.remove('modal-open');
+            break;
+        }
+    }
 }
 
 const Container = styled.div`
@@ -132,7 +154,6 @@ const ButtonContainer = styled.div`
     gap: 10px;
     flex: 1;
 `;
-
 
 const ButtonSecondary = styled.button`
     border-radius: 25px;

@@ -21,58 +21,50 @@ const feeds = () => {
   })
 }
 
+const createFeed = (payload) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const upload = storage
+      .ref(`images/${payload.image.name}`)
+      .put(payload.image);
+      upload.on('state_changed', (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log (`Progress ${progress}`);
+      },error => {
+        reject(error);
+      }, async() => {
+          const downloadUrl = await upload.snapshot.ref.getDownloadURL();
+          await db.collection('feeds').add({
+            user: {
+              name: payload.name,
+              positon: ''
+            },
+            post: {
+              postType: payload.postType,
+              image: downloadUrl,
+              description: payload.description
+            },
+            socialReactions: {
+                likes: 0,
+                comments: 0,
+                repost: 0
+            }
+          });
+          resolve(feeds);
+      })
+    } catch (error) {
+      reject(error);
+    }
+  })
+}
+
 export const fetchFeeds = createAsyncThunk('feeds/fetchFeeds', async() => {
     return await feeds();
 });
 
 
 export const postFeed = createAsyncThunk('feeds/postFeed', async(payload) => {
-  const upload = storage
-    .ref(`images/${payload.image.name}`)
-    .put(payload.image);
-    // upload.on('state_changed', (snapshot) => {
-    //   const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //   console.log (`Progress ${progress}`);
-    // },error => {
-    //   console.log(error);
-    // }, async() => {
-    //     const downloadUrl = await upload.snapshot.ref.getDownloadURL();
-    //     db.collection('feeds').add({
-    //       user: {
-    //         name: payload.user.displayName,
-    //         positon: ''
-    //       },
-    //       post: {
-    //         postType: 'image',
-    //           image: downloadUrl,
-    //           description: payload.description
-    //       },
-    //       socialReactions: {
-    //           likes: 0,
-    //           comments: 0,
-    //           repost: 0
-    //     }
-    //     });
-    // })
-
-    const downloadUrl = await upload.snapshot.ref.getDownloadURL();
-    db.collection('feeds').add({
-      user: {
-        name: payload.name,
-        positon: ''
-      },
-      post: {
-        postType: payload.postType,
-        image: downloadUrl,
-        description: payload.description
-      },
-      socialReactions: {
-          likes: 0,
-          comments: 0,
-          repost: 0
-      }
-    });
-    return downloadUrl;
+    return await createFeed(payload);
 });
 
 
